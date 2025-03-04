@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sanches_player/src/ui/home/views/home_view.dart';
-import 'package:sanches_player/src/ui/loading/views/loading_view.dart';
-import 'package:sanches_player/utils/typedefs.dart';
+import 'package:crazyplayer/src/ui/home/views/home_view.dart';
+import 'package:crazyplayer/src/ui/loading/views/loading_view.dart';
+import 'package:crazyplayer/utils/typedefs.dart';
 
 
 class AppNamedRoutes {
@@ -16,7 +16,7 @@ class AppRoutes {
   static const String initialRoute = AppNamedRoutes.loading;
   
   // Rotas do aplicativo
-  static final Map<String, CreateRouteFunction> rotas = {
+  static final Map<String, WidgetFunctionContext> rotas = {
     // Tela de carregamento
     AppNamedRoutes.loading: (context) => LoadingView(),
     AppNamedRoutes.home: (context) => HomeView()

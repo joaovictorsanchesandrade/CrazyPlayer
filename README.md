@@ -1,4 +1,4 @@
-# sanches_player
+# crazyplayer
 
 A new Flutter project.
 

@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:sanches_player/src/app/app_colors.dart';
-import 'package:sanches_player/src/data/services/permission_service/permission_service.dart';
-import 'package:sanches_player/utils/extensions/context.dart';
+import 'package:crazyplayer/src/app/app_colors.dart';
+import 'package:crazyplayer/src/data/services/permission_service/permission_service.dart';
+import 'package:crazyplayer/utils/extensions/context.dart';
+import 'package:flutter/services.dart';
 
 class LoadingView extends StatefulWidget {
   const LoadingView({super.key});
@@ -24,9 +25,10 @@ class _LoadingViewState extends State<LoadingView> {
       // Pedindo permissão do amarzenamento
       bool status = await PermissionService.requestStorage();
       
+      debugPrint('Storage permission: $status');
       if (!status){
         // Fechando o aplicativo
-        context.closeView();
+        SystemNavigator.pop(); // Fechar o aplicativo
         return;
       }
       
@@ -52,12 +54,32 @@ class _LoadingViewState extends State<LoadingView> {
           color: Colors.black
         ),
         child: Center(
-          child: Image.asset(
-            'assets/imagens/logo.png',
-            width: data.size.width*.7,
-          ),
-        ),
-      ),
+          child: ImagemAplicativoLoading()
+          )
+        )
     );
   }
 }
+
+class ImagemAplicativoLoading extends StatelessWidget {
+  const ImagemAplicativoLoading({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    MediaQueryData data = context.getMediaQueryData();
+
+    return Container(
+      width: data.size.width*.5,
+      height: data.size.width*.5,
+      decoration: BoxDecoration(
+        color: Colors.white24,
+        borderRadius: BorderRadius.circular(40.0)
+      ),
+      child:Image.asset(
+        'assets/imagens/logo.png',
+        fit: BoxFit.fill, // Preencher todo o espaço possivel
+      )
+    );
+  }
+}
+

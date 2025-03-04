@@ -1,6 +1,8 @@
+import 'package:crazyplayer/src/data/services/controler_audio_service/controler_audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:sanches_player/utils/extensions/context.dart';
-import 'package:sanches_player/utils/typedefs.dart';
+import 'package:crazyplayer/src/components/barra_de_ferramentas.dart';
+import 'package:crazyplayer/src/components/lista_musicas_padrao.dart';
+import 'package:crazyplayer/utils/extensions/context.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -11,6 +13,24 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   late MediaQueryData dataHomeView;
+  late ControlerAudioService controlerAudioService;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Criando o controle de audio
+    controlerAudioService = ControlerAudioService();
+  }
+
+  @override
+  void dispose() {
+    // Liberando recursos do controle de audios
+    controlerAudioService.liberarRecursos();
+
+    // Liberando recursos do home
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +41,14 @@ class _HomeViewState extends State<HomeView> {
         body: Container(
           width: dataHomeView.size.width,
           height: dataHomeView.size.height,
-          color: Colors.black87,
+          color: Colors.black,
             child:Column(
               children: [
                 SizedBox(
                   height: dataHomeView.size.height*.05,
                 ),
-                BarraDeFerramentas()
+                BarraDeFerramentas(),
+                ListaMusicasPadrao(controlerAudioService: controlerAudioService,)
               ],
             ),
         )
@@ -35,103 +56,4 @@ class _HomeViewState extends State<HomeView> {
   }
 
   
-}
-
-class BarraDeFerramentas extends StatefulWidget {
-  const BarraDeFerramentas({super.key});
-
-  @override
-  State<BarraDeFerramentas> createState() => _BarraDeFerramentasState();
-}
-
-class _BarraDeFerramentasState extends State<BarraDeFerramentas> {
-  // Informações sobre o contexto
-  late MediaQueryData data;
-
-  // Informações sobre o estado atual da barra de ferramentas
-  BarraDeFerramentasOpcoes ferramentaSelecionada = BarraDeFerramentasOpcoes.ALBUM;
-
-  @override
-  Widget build(BuildContext context) {
-    data = context.getMediaQueryData();
-    
-    return Column(
-      children:[
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child:Container(            
-            child:Row(              
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                // Criando os campos da barra de ferramenta
-                criarCampo(
-                  nomeBotao: 'Playlist',
-                  opcaoSelecionada: BarraDeFerramentasOpcoes.PLAYLIST,
-                ),
-                criarCampo(
-                  nomeBotao: 'Album',
-                  opcaoSelecionada: BarraDeFerramentasOpcoes.ALBUM,
-                ),
-                criarCampo(
-                  nomeBotao: 'Musicas',
-                  opcaoSelecionada: BarraDeFerramentasOpcoes.MUSICAS,
-                ),
-                criarCampo(
-                  nomeBotao: 'Curtidas',
-                  opcaoSelecionada: BarraDeFerramentasOpcoes.CURTIDAS,
-                ),
-              ],
-            )
-          )
-        ),
-        Divider()
-      ]
-    );
-  }
-
-  Widget criarCampo({
-    required String nomeBotao,
-    required BarraDeFerramentasOpcoes opcaoSelecionada,
-    ActionButtonBarTools? onPressed = null,
-  }){
-    // Verificando se o campo foi selecionado
-    final bool selecionado = opcaoSelecionada == ferramentaSelecionada;
-
-    // Criando o widget do campo   
-    return GestureDetector(
-      onTap:(onPressed == null) ? (){
-        setState(() {
-          ferramentaSelecionada = opcaoSelecionada;
-        });
-      }:onPressed,
-      child:Container(
-        margin: EdgeInsets.only(
-          left: data.size.width*.08
-        ),
-        decoration: BoxDecoration(
-          border: (selecionado) ? Border(
-            bottom: BorderSide(
-              color: Colors.white,
-              width: 2.0
-            )
-          ):null
-        ),
-        child: Text(
-          nomeBotao,
-          style: TextStyle(
-            color: (selecionado) ? Colors.white:Colors.grey,
-            fontWeight: FontWeight.bold,
-            fontSize: data.size.width*.035
-          ),
-        ),        
-      )
-    );
-  }
-}
-
-enum BarraDeFerramentasOpcoes {
-  PLAYLIST,
-  ALBUM,
-  MUSICAS,
-  CURTIDAS
 }

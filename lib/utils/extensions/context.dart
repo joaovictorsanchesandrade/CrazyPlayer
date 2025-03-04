@@ -1,6 +1,6 @@
 // Todas as extensões para o BuildContext se encotram aqui
 import 'package:flutter/material.dart';
-import 'package:sanches_player/src/routing/app_routes.dart';
+import 'package:crazyplayer/src/routing/app_routes.dart';
 
 extension MediaQueryGet on BuildContext {
   // Obter o media query data
