@@ -1,40 +1,71 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-class ControlerAudioService {
-
+class ControlerAudioService extends ChangeNotifier {
   // Criando o player
-  final _player = AudioPlayer();
+  final player = AudioPlayer();
+
   
-  Future<void> reproduzirAudio({
-    required AudioSource audioSource
+  Future<void> reproduzirPlaylist({
+    required ConcatenatingAudioSource concatenatigAudioSource,
+    int initialIndex = 0,
+    Duration position = const Duration(minutes: 0)
   }) async {
-    // Definindo o caminho do audio
-    await _player.setAudioSource(audioSource);
+
+    try {
+      // Definindo o caminho do audio
+      await player.setAudioSource(
+        concatenatigAudioSource,
+        initialPosition: position,
+        initialIndex: initialIndex
+      );
+      
+      // Aguardando o carregamento do audio
+      await player.load(); 
+
+      // Iniciando o audio
+      await player.play();    
+    }catch(e){
+      debugPrint('Ocorreu um erro ao produzir audio: $e');
+    }
     
-    // Aguarda o carregamento do audio
-    await _player.load(); 
     
-    // Iniciando o audio
-    await _player.play();    
+    // Enviando a notificação
+    notifyListeners();
   }
   
   Future<void> pararAudio() async {
     // Para a musica por completo
     // Caso você volte a reproduzir o audio irá voltar do inicio
-    await _player.stop();
+    await player.stop();
+    
+    // Enviando a notificação
+    notifyListeners();
   }
 
   Future<void> pausarAudio() async {
+
     // Pausa a musica
     // Mantem onde o usuario parou no audio.
-    await _player.pause();
+    await player.pause();
+
+    // Enviando a notificação
+    notifyListeners();
+  }
+
+  Future<void> tocarAudio() async {
+    // Tocar musica
+    // Volta a musica da onde parou o audio
+    await player.play();
+
+    // Enviando a notificação
+    notifyListeners();
   }
 
   Future<void> liberarRecursos() async {
     // Liberar recursos
     // Finaliza o player por completo
-    await _player.dispose();
+    await player.dispose();
   }
   
 }

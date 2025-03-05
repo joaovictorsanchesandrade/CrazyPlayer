@@ -1,3 +1,4 @@
+import 'package:crazyplayer/src/components/controle_musica_usuario.dart';
 import 'package:crazyplayer/src/data/services/controler_audio_service/controler_audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:crazyplayer/src/components/barra_de_ferramentas.dart';
@@ -42,13 +43,21 @@ class _HomeViewState extends State<HomeView> {
           width: dataHomeView.size.width,
           height: dataHomeView.size.height,
           color: Colors.black,
-            child:Column(
-              children: [
-                SizedBox(
-                  height: dataHomeView.size.height*.05,
+            child:Stack(
+              children:[
+                Column(
+                  children: [
+                    SizedBox(
+                      height: dataHomeView.size.height*.05,
+                    ),
+                    BarraDeFerramentas(),
+                    ListaMusicasPadrao(controlerAudioService: controlerAudioService,),
+                  ],
                 ),
-                BarraDeFerramentas(),
-                ListaMusicasPadrao(controlerAudioService: controlerAudioService,)
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: ControleMusicaUsuario(controlerAudioService: controlerAudioService)
+                )
               ],
             ),
         )

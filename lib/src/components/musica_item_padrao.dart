@@ -1,4 +1,6 @@
 
+import 'dart:typed_data';
+
 import 'package:crazyplayer/src/data/services/controler_audio_service/controler_audio_service.dart';
 import 'package:crazyplayer/src/data/services/media_audio_service/consulta_audio_service.dart';
 import 'package:crazyplayer/utils/extensions/context.dart';
@@ -10,39 +12,45 @@ import 'package:on_audio_query_forked/on_audio_query.dart';
 class MusicaItemPadrao extends StatefulWidget {
   final SongModel songModel;
   final ControlerAudioService controlerAudioService;
-
-  const MusicaItemPadrao({ required this.songModel, required this.controlerAudioService, super.key});
+  final VoidCallback onPlay;
+  const MusicaItemPadrao({ required this.songModel, required this.controlerAudioService, required this.onPlay, super.key});
 
   @override
-  State<MusicaItemPadrao> createState() => _MusicaItemPadraoState(songModel: songModel, controlerAudioService: controlerAudioService);
+  State<MusicaItemPadrao> createState() => _MusicaItemPadraoState(songModel: songModel, onPlay: onPlay);
 }
 
 class _MusicaItemPadraoState extends State<MusicaItemPadrao> {
   final SongModel songModel;
   final ConsultaAudioService consultaAudio = ConsultaAudioService();
-  final ControlerAudioService controlerAudioService;
-
-
+  final VoidCallback onPlay;
   late MediaQueryData data;
 
-  _MusicaItemPadraoState({required this.songModel, required this.controlerAudioService});
+  _MusicaItemPadraoState({required this.songModel, required this.onPlay});
 
   @override
   Widget build(BuildContext context) {
     data = context.getMediaQueryData();
-
+    
     return GestureDetector(
       onTap: () async {
         if (songModel.uri != null) {
-          debugPrint('Uri do audio: ${songModel.data}');
+          final Uri? caminhoCapaAudio = await consultaAudio.obterUriArteAudio(idAudio: songModel.id);
+          debugPrint('Uri do audio: ${caminhoCapaAudio}');
+
           // Reproduzindo o audio
-          controlerAudioService.reproduzirAudio(audioSource: AudioSource.uri(
-            Uri.parse(songModel.uri!),
-            tag: MediaItem(
-              id: '${songModel.id}', 
-              title: songModel.title
-            )           
-          ));
+          // controlerAudioService.reproduzirAudio(audioSource: AudioSource.uri(
+          //   Uri.parse(songModel.uri!),
+          //   tag: MediaItem(
+          //     id: '${songModel.id}', 
+          //     title: songModel.title,
+          //     artUri: caminhoCapaAudio,
+          //     artist: songModel.artist,
+
+          //   )
+          // ));
+          // Chamando o play da musica
+          onPlay();
+
         }
       },
       child:Container(
@@ -93,6 +101,7 @@ class _MusicaItemPadraoState extends State<MusicaItemPadrao> {
         if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null){
           return SizedBox();
         }
+
         
         // Retornando a imagem da musica
         return Image.memory(

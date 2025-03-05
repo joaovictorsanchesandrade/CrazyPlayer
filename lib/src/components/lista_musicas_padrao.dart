@@ -3,6 +3,8 @@ import 'package:crazyplayer/src/data/services/controler_audio_service/controler_
 import 'package:flutter/material.dart';
 import 'package:crazyplayer/src/data/services/media_audio_service/consulta_audio_service.dart';
 import 'package:crazyplayer/utils/extensions/context.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:on_audio_query_forked/on_audio_query.dart';
 
 class ListaMusicasPadrao extends StatefulWidget {
@@ -31,11 +33,15 @@ class _ListaMusicasPadraoState extends State<ListaMusicasPadrao> {
         future: consultaAudido.obterAudios(), 
         builder: (context, snapshot){
           if (snapshot.connectionState == ConnectionState.waiting){
-            return CircularProgressIndicator();
+            return Center(
+              child:CircularProgressIndicator()
+            );
           }
 
           if (snapshot.data == null){
-            return Text('Ocorreu um erro ao carregar as musicas');
+            return Center(
+              child:Text('Ocorreu um erro ao carregar as musicas')
+            );
           }
           
           return ListView.builder(
@@ -49,6 +55,22 @@ class _ListaMusicasPadraoState extends State<ListaMusicasPadrao> {
                     child: MusicaItemPadrao(
                       songModel: snapshot.data![index],
                       controlerAudioService: controlerAudioService,
+                      onPlay: (){
+                        debugPrint('Index: $index');
+                        controlerAudioService.reproduzirPlaylist(
+                          initialIndex: index,
+                          concatenatigAudioSource: ConcatenatingAudioSource(
+                            children: snapshot.data!.map((songModel) => AudioSource.uri(
+                              Uri.parse(songModel.uri!),
+                              tag: MediaItem(
+                                id: '${songModel.id}', 
+                                title: songModel.title,
+                                artist: songModel.artist,
+                              )
+                            )).toList(),
+                          )
+                        );
+                      },
                     )
                   )
                 ]
