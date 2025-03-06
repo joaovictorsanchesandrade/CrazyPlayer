@@ -21,7 +21,8 @@ class _ListaMusicasPadraoState extends State<ListaMusicasPadrao> {
 
   // Controlar os audios que estão sendo reproduzidos
   final ControlerAudioService controlerAudioService;
-  
+  final ConsultaAudioService consultaAudio = ConsultaAudioService();
+
   _ListaMusicasPadraoState({required this.controlerAudioService});
 
   @override
@@ -55,22 +56,32 @@ class _ListaMusicasPadraoState extends State<ListaMusicasPadrao> {
                     child: MusicaItemPadrao(
                       songModel: snapshot.data![index],
                       controlerAudioService: controlerAudioService,
-                      onPlay: (){
+                      onPlay: () async {
                         debugPrint('Index: $index');
-                        controlerAudioService.reproduzirPlaylist(
-                          initialIndex: index,
-                          concatenatigAudioSource: ConcatenatingAudioSource(
-                            children: snapshot.data!.map((songModel) => AudioSource.uri(
+
+                        // Espera todas as músicas serem processadas
+                        final List<AudioSource> audioSources = await Future.wait(
+                          snapshot.data!.map((songModel) async {
+                            final Uri? caminhoCapaAudio = await consultaAudio.obterUriArteAudio(idAudio: songModel.id);
+
+                            return AudioSource.uri(
                               Uri.parse(songModel.uri!),
                               tag: MediaItem(
                                 id: '${songModel.id}', 
                                 title: songModel.title,
                                 artist: songModel.artist,
-                              )
-                            )).toList(),
-                          )
+                                artUri: caminhoCapaAudio,
+                              ),
+                            );
+                          }).toList(),
                         );
-                      },
+
+                        // Agora passamos a playlist corretamente
+                        controlerAudioService.reproduzirPlaylist(
+                          initialIndex: index,
+                          concatenatigAudioSource: ConcatenatingAudioSource(children: audioSources),
+                        );
+                      }
                     )
                   )
                 ]
